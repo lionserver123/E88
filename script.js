@@ -19,92 +19,6 @@ document.querySelectorAll('.tabs').forEach((tabs) => {
   });
 });
 
-// 上方導覽列：點擊分類展開對應的平台視窗，再點一次、點外面或按 Esc 關閉
-(() => {
-  const items = [...document.querySelectorAll('.catnav__item[data-menu]')];
-  const wrap = document.querySelector('.platform-menus');
-  if (!items.length || !wrap) return;
-  const menuOf = (b) => document.getElementById(b.getAttribute('aria-controls'));
-  const close = () => {
-    wrap.classList.remove('is-open');
-    wrap.setAttribute('aria-hidden', 'true');
-    items.forEach((b) => b.setAttribute('aria-expanded', 'false'));
-  };
-  items.forEach((btn) => btn.addEventListener('click', () => {
-    const wasOpen = btn.getAttribute('aria-expanded') === 'true';
-    if (wasOpen) { close(); return; }
-    items.forEach((b) => {
-      const on = b === btn;
-      b.setAttribute('aria-expanded', on);
-      menuOf(b).classList.toggle('is-active', on);
-    });
-    menuOf(btn).querySelector('.platform-menu__row').scrollLeft = 0;
-    wrap.classList.add('is-open');
-    wrap.setAttribute('aria-hidden', 'false');
-  }));
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.catnav, .platform-menus')) close();
-  });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
-
-  // 平台列橫向滑卡：手指滑動、滑鼠拖曳、滾輪與左右箭頭都能切換
-  document.querySelectorAll('.platform-menu').forEach((menu) => {
-    const row = menu.querySelector('.platform-menu__row');
-    const prev = menu.querySelector('.platform-menu__arrow--prev');
-    const next = menu.querySelector('.platform-menu__arrow--next');
-    const step = () => {
-      const card = row.querySelector('li');
-      const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
-      const per = card ? card.offsetWidth + gap : 300;
-      return Math.max(per, Math.floor(row.clientWidth / per) * per);   // 一次捲過一整頁的卡片
-    };
-    const update = () => {
-      const max = row.scrollWidth - row.clientWidth;
-      if (prev) prev.hidden = row.scrollLeft <= 2;
-      if (next) next.hidden = row.scrollLeft >= max - 2;
-    };
-    prev?.addEventListener('click', () => row.scrollBy({ left: -step(), behavior: 'smooth' }));
-    next?.addEventListener('click', () => row.scrollBy({ left: step(), behavior: 'smooth' }));
-    row.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    new MutationObserver(update).observe(menu, { attributes: true, attributeFilter: ['class'] });
-    update();
-
-    // 滑鼠滾輪上下滾動 → 左右捲動
-    row.addEventListener('wheel', (e) => {
-      if (row.scrollWidth <= row.clientWidth || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-      e.preventDefault();
-      row.scrollBy({ left: e.deltaY });
-    }, { passive: false });
-
-    // 滑鼠拖曳（觸控裝置用原生滑動）
-    let startX = 0, startLeft = 0, moved = false, down = false;
-    row.addEventListener('pointerdown', (e) => {
-      if (e.pointerType !== 'mouse' || e.button !== 0) return;
-      down = true; moved = false; startX = e.clientX; startLeft = row.scrollLeft;
-    });
-    window.addEventListener('pointermove', (e) => {
-      if (!down) return;
-      const dx = e.clientX - startX;
-      if (!moved && Math.abs(dx) > 5) { moved = true; row.classList.add('is-dragging'); }
-      if (moved) row.scrollLeft = startLeft - dx;
-    });
-    window.addEventListener('pointerup', () => {
-      if (!down) return;
-      down = false;
-      if (moved) {
-        row.classList.remove('is-dragging');
-        // 放開後對齊最近的一張卡片
-        const per = (row.querySelector('li')?.offsetWidth || 1) + (parseFloat(getComputedStyle(row).columnGap) || 0);
-        row.scrollTo({ left: Math.round(row.scrollLeft / per) * per, behavior: 'smooth' });
-      }
-    });
-    // 拖曳後放開不觸發卡片連結
-    row.addEventListener('click', (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
-  });
-
-})();
-
 // 最新公告：複製一組內容，讓跑馬燈無縫循環（動畫移動 -50%）
 document.querySelectorAll('.notice__track').forEach((track) => {
   const group = track.querySelector('.notice__group');
@@ -223,4 +137,57 @@ document.querySelectorAll('.notice__track').forEach((track) => {
 
   go(0);
   start();
+})();
+
+// 娛樂城常見問題：點題目展開／收合答案
+document.querySelectorAll('.faq__item').forEach((item) => {
+  const btn = item.querySelector('.faq__toggle');
+  btn?.addEventListener('click', () => {
+    const open = !item.classList.contains('is-open');
+    item.classList.toggle('is-open', open);
+    btn.setAttribute('aria-expanded', open);
+  });
+});
+
+// 分類頁頁尾的平台輪播：平台多到放不下時自動循環捲動，放得下時置中顯示
+document.querySelectorAll('.platform-strip').forEach((strip) => {
+  const viewport = strip.querySelector('.platform-strip__viewport');
+  const track = strip.querySelector('.platform-strip__track');
+  const originals = [...track.children];
+  const SPEED = 50;   // 每秒移動 px
+  let clones = [];
+
+  const layout = () => {
+    clones.forEach((c) => c.remove()); clones = [];
+    strip.classList.remove('is-scrolling');
+    const needed = track.scrollWidth > viewport.clientWidth;
+    if (!needed) return;
+    originals.forEach((li) => {
+      const c = li.cloneNode(true);
+      c.setAttribute('aria-hidden', 'true');
+      c.querySelector('a')?.setAttribute('tabindex', '-1');
+      track.appendChild(c); clones.push(c);
+    });
+    strip.style.setProperty('--strip-duration', (track.scrollWidth / 2 / SPEED) + 's');
+    strip.classList.add('is-scrolling');
+  };
+  let t;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(layout, 150); });
+  layout();
+});
+
+// 手機／平板頁首：選單按鈕展開分類，點外面、按 Esc 或點連結後收起
+(() => {
+  const btn = document.querySelector('.menu-toggle');
+  const nav = document.getElementById('mainnav');
+  if (!btn || !nav) return;
+  const set = (open) => {
+    nav.classList.toggle('is-open', open);
+    btn.setAttribute('aria-expanded', open);
+    btn.setAttribute('aria-label', open ? '關閉選單' : '開啟選單');
+  };
+  btn.addEventListener('click', () => set(btn.getAttribute('aria-expanded') !== 'true'));
+  document.addEventListener('click', (e) => { if (!e.target.closest('.topbar')) set(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') set(false); });
+  window.matchMedia('(min-width: 1101px)').addEventListener('change', (e) => { if (e.matches) set(false); });
 })();

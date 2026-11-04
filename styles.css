@@ -90,93 +90,33 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   box-shadow: 0 0 10px var(--gold-light);
 }
 
-.catnav { background: var(--white); }
-.catnav__list {
-  height: 60px;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 32px;
-  overflow-x: auto;
-  scrollbar-width: none;
+.topbar__inner { gap: 56px; }
+.logo { flex-shrink: 0; }
+.logo img { display: block; }
+.topbar .btn-primary { flex-shrink: 0; }
+.mainnav { flex: 1; min-width: 0; }
+.mainnav__list {
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  padding-inline: clamp(0px, 3.5vw, 56px);
 }
-.catnav__list::-webkit-scrollbar { display: none; }
-.catnav__list > li { flex-shrink: 0; }
-.catnav__item {
-  display: flex; align-items: center; gap: 12px;
+.mainnav__list > li { flex-shrink: 0; }
+.mainnav__item {
+  display: block;
   color: var(--gray-dark);
   font-size: 16px; line-height: 24px; font-weight: 500;
   white-space: nowrap;
   transition: color .2s;
 }
-.catnav__item img, .catnav__icon { height: 24px; width: auto; flex-shrink: 0; }
-.catnav__icon { display: block; }
-.catnav__item { padding: 0; cursor: pointer; }
-.catnav__item:hover, .catnav__item:focus-visible, .catnav__item[aria-expanded="true"] { color: var(--gold); }  /* 滑入／選中：圖示與文字都改為品牌深色 */
+/* 滑入、目前所在分頁：品牌深色 */
+.mainnav__item:hover, .mainnav__item:focus-visible,
+.mainnav__item[aria-current="page"] { color: var(--gold); }
 
-/* ---------- 平台視窗（點導覽列展開） ---------- */
-.topbar, .catnav { position: relative; z-index: 2; }
-/* 外層裁切，內層從導覽列下緣往下滑出 */
-.platform-menus {
-  position: absolute; left: 0; right: 0; top: 100%; z-index: 1;
-  overflow: hidden;
-  visibility: hidden;
-  transition: visibility 0s linear .4s;
-}
-.platform-menus.is-open { visibility: visible; transition-delay: 0s; }
-.platform-menus__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  background: rgba(0, 0, 0, .75);
-  transform: translateY(-100%);
-  transition: transform .4s cubic-bezier(.22, .8, .25, 1);
-}
-.platform-menus.is-open .platform-menus__inner { transform: translateY(0); }
-/* 各分類疊在同一格，切換時淡入淡出 */
-.platform-menu {
-  grid-area: 1 / 1;
-  position: relative;
-  min-width: 0;
-  opacity: 0; visibility: hidden;
-  transition: opacity .25s ease, visibility 0s linear .25s;
-}
-.platform-menu.is-active { opacity: 1; visibility: visible; transition-delay: 0s; }
-.platform-menu__row {
-  display: flex; align-items: center; gap: 72px;
-  max-width: var(--page-max); margin-inline: auto;
-  padding: 54px max(var(--gutter), env(safe-area-inset-left, 0px));
-  overflow-x: auto; overflow-y: hidden;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  scroll-snap-type: x proximity;
-  scroll-padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px));
-  cursor: grab;
-  user-select: none;
-}
-.platform-menu__row::-webkit-scrollbar { display: none; }
-.platform-menu__row > li { flex-shrink: 0; scroll-snap-align: start; }
-.platform-menu__row.is-dragging { cursor: grabbing; scroll-snap-type: none; }
-.platform-menu__row.is-dragging .platform-card { pointer-events: none; }
-.platform-card img { -webkit-user-drag: none; }
-
-/* 左右箭頭：只在可捲動的方向出現 */
-.platform-menu__arrow {
-  position: absolute; top: 50%; z-index: 1;
-  width: 44px; height: 44px; margin-top: -22px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 50%;
-  background: var(--gold); color: var(--white);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .4);
-  transition: opacity .2s ease, background-color .2s ease;
-}
-.platform-menu__arrow:hover { background: var(--gold-light); }
-.platform-menu__arrow--prev { left: 16px; }
-.platform-menu__arrow--next { right: 16px; }
-.platform-menu__arrow[hidden] { display: none; }
-@media (hover: none) { .platform-menu__arrow { display: none; } }
+/* ---------- 平台卡片（分類頁頁尾輪播） ---------- */
 .platform-card {
   display: block; width: 212px; height: 212px; flex-shrink: 0;
   transition: transform .25s ease;
 }
-.platform-card img { width: 100%; height: 100%; object-fit: cover; }
+.platform-card img { width: 100%; height: 100%; object-fit: cover; -webkit-user-drag: none; }
 .platform-card:hover, .platform-card:focus-visible { transform: scale(1.08); }  /* 滑入只放大，不發光 */
 
 /* =========================================================
@@ -339,9 +279,7 @@ main {
   opacity: 0;
   transition: opacity .2s ease;
 }
-.game:hover, .game:focus-visible { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0, 0, 0, .2); }
-.game:hover .game__name, .game:focus-visible .game__name { opacity: 1; }
-.game--logo:hover, .game--logo:focus-visible { box-shadow: 0 8px 16px rgba(0, 0, 0, .12); }
+.game:hover .game__name { opacity: 1; }
 
 /* ---------- E88 行動娛樂 ---------- */
 .card--app {
@@ -481,7 +419,6 @@ main {
 /* ---- ≤1200：平板橫向 / 小筆電 ---- */
 @media (max-width: 1200px) {
   :root { --gutter: 32px; --radius-xl: 48px; --section-gap: 56px; }
-  .catnav__list { justify-content: flex-start; gap: 40px; }
   .card--games { padding: 40px; }
   .game-grid { grid-template-columns: repeat(6, 1fr); gap: 20px; }
   .stats { padding-inline: 0; }
@@ -508,15 +445,7 @@ main {
 @media (max-width: 768px) {
   :root { --gutter: 16px; --radius-xl: 24px; --section-gap: 40px; }
 
-  .topbar__inner { height: 64px; }
-  .logo img { height: 44px; }
   .btn-primary { width: 120px; height: 40px; font-size: 14px; }
-  .catnav__list { height: 52px; gap: 28px; }
-  .catnav__item { font-size: 14px; gap: 8px; }
-  .catnav__item img, .catnav__icon { height: 20px; }
-  .platform-menu__row { gap: 20px; padding-block: 24px; }
-  .platform-menu__arrow { width: 36px; height: 36px; margin-top: -18px; }
-  .platform-card { width: 120px; height: 120px; }
 
   main { padding-top: 16px; }
   .hero { gap: 16px; }
@@ -575,9 +504,223 @@ main {
   .banner__track { transition: none; }
   .game, .btn-primary { transition: none; }
   .game-grid.is-entering { animation: none; }
-  .platform-menus__inner, .platform-menu { transition: none; }
 }
 
 /* 錨點跳轉時避開固定的頂部列 */
-#games { scroll-margin-top: 180px; }
-@media (max-width: 768px) { #games { scroll-margin-top: 136px; } }
+#games { scroll-margin-top: 120px; }
+
+/* 選單按鈕（Figma 6046:6023）：桌機隱藏 */
+.menu-toggle { display: none; }
+
+/* =========================================================
+   頁首（≤1100px）：Logo＋立即註冊＋選單按鈕；
+   點選單按鈕，分類從頁首下方滑出，置中排列
+   ========================================================= */
+@media (max-width: 1100px) {
+  .topbar__inner { height: 96px; gap: 16px; }
+  .topbar .btn-primary { margin-left: auto; }
+  .menu-toggle {
+    display: flex; flex-direction: column; justify-content: center; gap: 8px;
+    flex: 0 0 40px; height: 40px; padding: 0 8px;
+    border-radius: 4px; background: var(--gray);
+    transition: background-color .2s;
+  }
+  .menu-toggle span {
+    display: block; height: 3px; background: var(--white);
+    transition: transform .25s ease;
+  }
+  .menu-toggle:hover, .menu-toggle[aria-expanded="true"] { background: var(--gold); }
+  /* 開啟時兩條線轉成 X */
+  .menu-toggle[aria-expanded="true"] span:first-child { transform: translateY(5.5px) rotate(45deg); }
+  .menu-toggle[aria-expanded="true"] span:last-child { transform: translateY(-5.5px) rotate(-45deg); }
+
+  .mainnav {
+    position: absolute; left: 0; right: 0; top: 100%;
+    background: var(--white);
+    border-top: 1px solid var(--gray-light);
+    box-shadow: 0 12px 16px rgba(0, 0, 0, .12);
+    display: grid; grid-template-rows: 0fr;
+    visibility: hidden;
+    transition: grid-template-rows .3s ease, visibility 0s linear .3s;
+  }
+  .mainnav.is-open { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
+  .mainnav__list {
+    overflow: hidden; min-height: 0;
+    flex-direction: column; justify-content: flex-start; gap: 0;
+    padding-inline: 0;
+  }
+  .mainnav__list > li { width: 100%; }
+  .mainnav__list > li + li { border-top: 1px solid var(--gray-light); }
+  .mainnav__item { padding: 16px; text-align: center; font-size: 16px; }
+  .mainnav__list > li:first-child .mainnav__item { padding-top: 20px; }
+  .mainnav__list > li:last-child .mainnav__item { padding-bottom: 20px; }
+}
+@media (max-width: 768px) {
+  #games { scroll-margin-top: 110px; }
+  .topbar__inner { height: 80px; gap: 12px; padding-top: 0; }
+  .logo img { height: 48px; }
+  .topbar .btn-primary { width: 150px; height: 44px; font-size: 15px; }
+}
+@media (max-width: 400px) {
+  .logo img { height: 42px; }
+  .topbar .btn-primary { width: 120px; height: 40px; font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mainnav, .menu-toggle span { transition: none; }
+}
+
+/* =========================================================
+   娛樂城常見問題
+   ========================================================= */
+.faq { display: flex; flex-direction: column; gap: 16px; }
+.faq__title { text-align: center; }
+.faq__list { display: flex; flex-direction: column; gap: 16px; }
+.faq__item { background: var(--white); border-radius: 32px; overflow: hidden; }
+.faq__q { margin: 0; font: inherit; }
+.faq__toggle {
+  width: 100%;
+  display: flex; align-items: center; gap: 24px;
+  padding: 32px;
+  text-align: left;
+}
+.faq__badge {
+  flex: 0 0 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--gold); border-radius: 8px;
+  color: var(--gold);
+  font-size: 20px; font-weight: 900; line-height: 1;
+}
+.faq__text { flex: 1; min-width: 0; font-size: 20px; line-height: 28px; color: var(--black); transition: color .2s; }
+.faq__toggle:hover .faq__text { color: var(--gold); }
+.faq__chevron { flex: 0 0 40px; display: block; transition: transform .3s ease; }
+.faq__chevron svg { display: block; }
+.faq__chevron circle { fill: #f6efe0; stroke: var(--gold); stroke-width: 1; }
+.faq__chevron path { fill: none; stroke: var(--gold); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.faq__badge { transition: background-color .2s, color .2s; }
+.faq__item.is-open .faq__badge { background: var(--gold); color: var(--white); }   /* 展開：Q 改為金底白字 */
+.faq__item.is-open .faq__chevron { transform: rotate(180deg); }                    /* 收合朝上、展開朝下 */
+/* 答案：展開時高度平滑過渡 */
+.faq__panel {
+  display: grid; grid-template-rows: 0fr;
+  background: #fafafa;
+  transition: grid-template-rows .3s ease;
+}
+.faq__item.is-open .faq__panel { grid-template-rows: 1fr; }
+.faq__panel-inner { overflow: hidden; }
+.faq__a { padding: 32px 32px 32px 96px; color: var(--black); font-size: 16px; line-height: 24px; }
+
+/* =========================================================
+   分類分頁
+   ========================================================= */
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+main.page { padding-top: 72px; }
+
+/* 主視覺：左圖右文 */
+.intro { display: flex; align-items: center; gap: 32px; }
+.intro__img {
+  flex: 0 0 56.6%; width: 56.6%; height: auto;
+  aspect-ratio: 2 / 1; object-fit: cover;
+  border-radius: var(--radius-xl);
+}
+.intro__body {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 16px;
+  padding: 24px 48px 24px 0;
+}
+.intro__body .h1 { text-wrap: balance; }
+.intro__text { display: flex; flex-direction: column; gap: 8px; }
+.intro__text p { font-size: 16px; line-height: 24px; }
+
+/* 說明卡：三段置中標題與內文 */
+.info {
+  display: flex; flex-direction: column; gap: 48px;
+  padding: 40px 48px;
+  text-align: center;
+}
+.info__item { display: flex; flex-direction: column; gap: 8px; }
+/* 說明主標與上方副標同字級（Tittle_Ch 24/28 SemiBold） */
+.info__item .h1 { font-size: 24px; line-height: 28px; font-weight: 600; }
+/* 內文：網頁 16px、手機 14px */
+.info__item p { font-size: 16px; line-height: 24px; }
+
+/* 遊戲類型圖卡 */
+.type-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
+.type-card {
+  position: relative; border-radius: 32px; overflow: hidden; aspect-ratio: 400 / 200;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 24px;
+}
+.type-card__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.type-card::after {                    /* 底部漸層讓文字清楚（Figma：透明 → 60% 黑） */
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .6) 89%);
+}
+/* 滑入狀態（Figma 6044:5373 Variant2）：2px 品牌輔色外框 */
+.type-card::before {
+  content: ""; position: absolute; inset: 0; z-index: 2;
+  border: 2px solid transparent; border-radius: inherit;
+  pointer-events: none;
+  transition: border-color .25s ease;
+}
+.type-card:hover::before { border-color: var(--gold-light); }
+.type-card__img { transition: transform .4s ease; }
+.type-card:hover .type-card__img { transform: scale(1.04); }
+.type-card__text { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 4px; text-align: center; }
+.type-card__title { color: var(--gold); font-size: 24px; line-height: 28px; font-weight: 600; }
+.type-card__desc { color: var(--white); font-size: 16px; line-height: 24px; }
+
+/* 頁尾上方的平台輪播 */
+.platform-strip { background: var(--ink); }
+.platform-strip__viewport { overflow: hidden; padding-block: 54px; }
+.platform-strip__track { display: flex; width: max-content; margin-inline: auto; }
+.platform-strip__track > li { flex-shrink: 0; margin-inline: 48px; }
+.platform-strip.is-scrolling .platform-strip__track {
+  margin-inline: 0;
+  animation: strip-scroll var(--strip-duration, 60s) linear infinite;
+}
+.platform-strip.is-scrolling:hover .platform-strip__track { animation-play-state: paused; }
+@keyframes strip-scroll { to { transform: translateX(-50%); } }
+
+@media (max-width: 1200px) {
+  .type-card { padding: 16px; }
+  .type-card__title { font-size: 20px; line-height: 26px; }
+  .type-card__desc { font-size: 14px; line-height: 20px; }
+  .type-cards { gap: 24px; }
+}
+@media (max-width: 992px) {
+  .intro { flex-direction: column; align-items: stretch; gap: 24px; }
+  .intro__img { width: 100%; flex: none; }
+  .intro__body { padding: 0 32px 32px; }
+}
+@media (max-width: 768px) {
+  main.page { padding-top: 16px; }
+  .faq__toggle { padding: 20px 16px; gap: 12px; }
+  .faq__badge { flex-basis: 32px; height: 32px; font-size: 16px; }
+  .faq__text { font-size: 16px; line-height: 24px; }
+  .faq__chevron { flex-basis: 32px; }
+  .faq__chevron svg { width: 32px; height: 32px; }
+  .faq__item { border-radius: 20px; }
+  .faq__a { padding: 16px 16px 20px 60px; font-size: 14px; line-height: 22px; }
+  .intro__body { padding: 0 16px 24px; }
+  .intro__text p { font-size: 14px; line-height: 22px; }
+  .info { padding: 32px 16px; gap: 32px; }
+  .info__item .h1 { font-size: 20px; line-height: 26px; }
+  .info__item p { font-size: 14px; line-height: 22px; text-align: left; }
+  .type-cards { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .type-card { border-radius: 20px; padding: 16px; }
+  .type-card__title { font-size: 20px; line-height: 26px; }
+  .type-card__desc { font-size: 14px; line-height: 22px; }
+  .platform-strip__viewport { padding-block: 28px; }
+  .platform-strip__track > li { margin-inline: 12px; }
+  .platform-strip .platform-card { width: 132px; height: 132px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq__panel, .faq__chevron { transition: none; }
+  .type-card::before, .type-card__img { transition: none; }
+  .type-card:hover .type-card__img { transform: none; }
+  .platform-strip.is-scrolling .platform-strip__track { animation: none; }
+  .platform-strip.is-scrolling .platform-strip__viewport { overflow-x: auto; }
+}
