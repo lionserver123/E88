@@ -445,7 +445,6 @@ main {
 @media (max-width: 768px) {
   :root { --gutter: 16px; --radius-xl: 24px; --section-gap: 40px; }
 
-  .btn-primary { width: 120px; height: 40px; font-size: 14px; }
 
   main { padding-top: 16px; }
   .hero { gap: 16px; }
@@ -559,11 +558,13 @@ main {
   #games { scroll-margin-top: 110px; }
   .topbar__inner { height: 80px; gap: 12px; padding-top: 0; }
   .logo img { height: 48px; }
-  .topbar .btn-primary { width: 150px; height: 44px; font-size: 15px; }
+  /* 手機：所有按鈕與頁首「立即註冊」同尺寸 */
+  .btn-primary { width: 150px; height: 44px; font-size: 15px; }
+  .intro__body .btn-primary { align-self: center; }   /* 分頁主視覺按鈕置中 */
 }
 @media (max-width: 400px) {
   .logo img { height: 42px; }
-  .topbar .btn-primary { width: 120px; height: 40px; font-size: 14px; }
+  .btn-primary { width: 120px; height: 40px; font-size: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .mainnav, .menu-toggle span { transition: none; }
